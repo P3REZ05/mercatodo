@@ -1,0 +1,137 @@
+scrript base de datos
+
+
+-- Crear la base de datos "proyecto"
+CREATE DATABASE mercatodo;
+USE mercatodo;
+
+-- Tabla Rol
+CREATE TABLE Rol (
+    ID_rol INT PRIMARY KEY,
+    nombre_rol VARCHAR(55)
+)engine=InnoDB charset=utf8;
+
+-- Tabla Permisos
+CREATE TABLE Permisos (
+    ID_permiso INT PRIMARY KEY,
+    nombre_permiso VARCHAR(55)
+)engine=InnoDB charset=utf8;
+
+-- Tabla Configuracion
+CREATE TABLE Configuracion (
+    ID_configuracion INT PRIMARY KEY,
+    ID_rol INT,
+    ID_permiso INT,
+    FOREIGN KEY (ID_rol) REFERENCES Rol(ID_rol),
+    FOREIGN KEY (ID_permiso) REFERENCES Permisos(ID_permiso)
+)engine=InnoDB charset=utf8;
+
+-- Tabla Usuarios
+CREATE TABLE Usuarios (
+    ID_usuario INT PRIMARY KEY,
+    Nombre VARCHAR(55),
+    ID_rol INT,
+    cedula INT,
+    fecha_registro DATE,
+    FOREIGN KEY (ID_rol) REFERENCES Rol(ID_rol)
+)engine=InnoDB charset=utf8;
+
+-- Tabla Proveedores
+CREATE TABLE Proveedores (
+    ID_proveedor INT PRIMARY KEY,
+    Nombre_empresa VARCHAR(55),
+    Nombre_representante_legal VARCHAR(55),
+    tipo_proveedor VARCHAR(55),
+    direccion VARCHAR(55),
+    telefono VARCHAR(20),
+    email VARCHAR(55),
+    URL VARCHAR(55)
+)engine=InnoDB charset=utf8;
+
+-- Tabla Categoria_producto
+CREATE TABLE Categoria_producto (
+    ID_categoria_producto INT PRIMARY KEY,
+    nombre_categoria VARCHAR(55)
+)engine=InnoDB charset=utf8;
+
+-- Tabla Producto
+CREATE TABLE Producto (
+    ID_producto INT PRIMARY KEY,
+    nombre_producto varchar(55),
+    perecedero varchar(2),
+    ID_categoria_producto INT,
+    fecha_registro DATE,
+    lote varchar(30),
+    fecha_caducidad DATE,
+    foto_producto blob,
+    valor_producto DECIMAL(10,2),
+    cantidad_inicial INT,
+    ID_proveedor INT,
+    FOREIGN KEY (ID_categoria_producto) REFERENCES Categoria_producto(ID_categoria_producto),
+    FOREIGN KEY (ID_proveedor) REFERENCES Proveedores(ID_proveedor)
+)engine=InnoDB charset=utf8;
+
+-- Tabla Inventario
+CREATE TABLE Inventario (
+    ID_inventario INT PRIMARY KEY,
+    ID_producto INT,
+    stock_minimo INT,
+    cantidad INT,
+    FOREIGN KEY (ID_producto) REFERENCES Producto(ID_producto)
+)engine=InnoDB charset=utf8;
+
+-- Tabla Compras
+CREATE TABLE Compras (
+    ID_compra INT PRIMARY KEY,
+    fecha_compra DATE,
+    valor_compra DECIMAL(10,2),
+    ID_inventario int,
+    ID_proveedor int,
+    foreign key (ID_inventario) references Inventario(ID_inventario),
+    foreign key (ID_proveedor) references Proveedores(ID_proveedor)
+)engine=InnoDB charset=utf8;
+
+-- Tabla Detalle_compra
+CREATE TABLE Detalle_compra (
+    ID_detalle_compra INT PRIMARY KEY,
+    ID_compra INT,
+    ID_producto INT,
+    FOREIGN KEY (ID_compra) REFERENCES Compras(ID_compra),
+    FOREIGN KEY (ID_producto) REFERENCES Producto(ID_producto)
+)engine=InnoDB charset=utf8;
+
+-- Tabla Ventas
+CREATE TABLE Ventas (
+    ID_venta INT PRIMARY KEY,
+    fecha_venta DATE,
+    ID_usuario INT,
+    ID_inventario int,
+    foreign key (ID_inventario) references Inventario(ID_inventario),
+    FOREIGN KEY (ID_usuario) REFERENCES Usuarios(ID_usuario)
+)engine=InnoDB charset=utf8;
+
+-- Tabla Detalle_ventas
+CREATE TABLE Detalle_ventas (
+    ID_detalle_venta INT PRIMARY KEY,
+    ID_venta INT,
+    ID_producto INT,
+    cantidad INT,
+    valor_venta_producto DECIMAL(10,2),
+    FOREIGN KEY (ID_venta) REFERENCES Ventas(ID_venta),
+    FOREIGN KEY (ID_producto) REFERENCES Producto(ID_producto)
+)engine=InnoDB charset=utf8;
+
+-- Tabla Devoluciones
+CREATE TABLE Devoluciones (
+    ID_devolucion INT PRIMARY KEY,
+    ID_detalle_venta INT,
+    ID_producto INT,
+    Cantidad INT,
+    Nota_devolucion TEXT,
+    ID_inventario int,
+    foreign key (ID_inventario) references Inventario(ID_inventario),
+    FOREIGN KEY (ID_detalle_venta) REFERENCES Detalle_ventas(ID_detalle_venta),
+    FOREIGN KEY (ID_producto) REFERENCES Producto(ID_producto)
+)engine=InnoDB charset=utf8;
+
+-- drop database proyecto
